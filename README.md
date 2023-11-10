@@ -2,16 +2,17 @@
 
 A simple real-time chat application using Node.js, Express.js, and Socket.IO.
 
-- Enter a username and room name to enter a room.
-- User cant enter the room without username , show a toast message to enter correct informations
-- After establishing a connection Send Chat Message to the room
+# Start the chat server
 
-![](chat.gif)
+```bash
+# OR using Yarn
+yarn install
+yarn server
+```
 
-- Another user Enters the room and can see all chat messages and send chat messages to everone in the room
-- Users can disconnect and no new messages will be broadcasted into the room.
-
-![](chat1.gif)
+```bash
+Listening on *:9000
+```
 
 # Getting Started for Mobile Apps
 
@@ -54,3 +55,16 @@ npm run ios
 # OR using Yarn
 yarn ios
 ```
+
+## Step 3: Start Chatting
+
+- Enter a username and room name to enter a room.
+- User cant enter the room without username , show a toast message to enter correct informations
+- After establishing a connection Send Chat Message to the room
+
+![](chat.gif)
+
+- Another user Enters the room and can see all chat messages and send chat messages to everone in the room
+- Users can disconnect and no new messages will be broadcasted into the room.
+
+![](chat1.gif)
