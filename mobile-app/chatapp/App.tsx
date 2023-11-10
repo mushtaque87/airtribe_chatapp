@@ -46,7 +46,7 @@ function App(): JSX.Element {
     DefaultEventsMap
   > | null>(null);
 
-  const [chats, setChats] = useState<[string] | null>();
+  const [chats, setChats] = useState<[string]>(['']);
 
   useEffect(() => {
     const newSocket = io('http://localhost:9000'); // replace with your server URL
