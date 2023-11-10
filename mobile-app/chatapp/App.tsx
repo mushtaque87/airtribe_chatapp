@@ -46,16 +46,22 @@ function App(): JSX.Element {
     DefaultEventsMap
   > | null>(null);
 
-  const [chats, setChats] = useState<[string]>(['']);
+  const [chats, setChats] = useState<[string] | null>();
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3000'); // replace with your server URL
+    const newSocket = io('http://localhost:9000'); // replace with your server URL
     setSocket(() => newSocket);
 
-    newSocket.on('chat message', chat => {
+    newSocket.on('chat-message', chat => {
       console.log('received chat message', chat, chats);
       // setChats(chat => [...chats, chat]);
       setChats(chats => [...chats, chat]);
+    });
+
+    newSocket.on('join-room', chat => {
+      console.log('join-room', chat);
+      // setChats(chat => [...chats, chat]);
+      //setChats(chats => [...chats, chat]);
     });
 
     return () => {
@@ -63,6 +69,13 @@ function App(): JSX.Element {
     };
   }, [chats]);
 
+  const renderItem = (item: any, index: number) => {
+    return (
+      <View>
+        <Text></Text>
+      </View>
+    );
+  };
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -91,8 +104,7 @@ function App(): JSX.Element {
                 alignItems: 'center',
 
                 height: 40,
-                borderColor: 'gray',
-                borderWidth: 1,
+                ...styles.input,
               }}
               placeholder="Username"
               onChangeText={text => setUsername(text)}
@@ -103,8 +115,7 @@ function App(): JSX.Element {
                 width: '30%',
                 alignItems: 'center',
                 height: 40,
-                borderColor: 'gray',
-                borderWidth: 1,
+                ...styles.input,
                 marginHorizontal: 10,
               }}
               placeholder="Room name"
@@ -114,23 +125,30 @@ function App(): JSX.Element {
             <Button
               title="Enter"
               onPress={() => {
-                console.log('Button pressed!');
-                if (socket) {
-                  socket.emit('join room', roomName, userName);
+                if (socket && userName && roomName) {
+                  socket.emit('join-room', roomName, userName);
                 }
               }}
             />
           </View>
-          <View style={{ flex: 1, flexDirection: 'row', marginTop: 50 }}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              marginTop: 50,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
             <TextInput
               style={{
-                width: '50%',
+                width: '80%',
                 alignItems: 'center',
                 height: 40,
-                borderColor: 'gray',
-                borderWidth: 1,
+                ...styles.input,
               }}
-              onChangeText={text => setChat(text)}
+              onChangeText={text => {
+                setChat(text);
+              }}
               value={chat}
             />
             <Button
@@ -138,16 +156,23 @@ function App(): JSX.Element {
               onPress={() => {
                 console.log('Button pressed!');
                 if (socket) {
-                  socket.emit('chat message', roomName, chat);
+                  socket.emit('chat-message', roomName, chat);
+                  setChat('');
                 }
               }}
             />
           </View>
-          <FlatList
-            data={chats}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => <Text>{item.msg}</Text>}
-          />
+          {chats && (
+            <FlatList
+              data={chats}
+              keyExtractor={item => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.item}>
+                  <Text style={styles.itemText}>{item.msg}</Text>
+                </View>
+              )}
+            />
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -170,6 +195,26 @@ const styles = StyleSheet.create({
   },
   highlight: {
     fontWeight: '700',
+  },
+  input: {
+    backgroundColor: '#fff',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    margin: 10,
+  },
+  item: {
+    backgroundColor: '#fff',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    margin: 10,
+  },
+  itemText: {
+    fontSize: 16,
+    color: '#000',
   },
 });
 

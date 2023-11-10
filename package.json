@@ -7,7 +7,7 @@
   "license": "MIT",
 
   "scripts": {
-    "server": "ts-node-dev --transpile-only --no-notify --exit-child server.ts",
+    "server": "ts-node-dev --transpile-only --no-notify --exit-child  chatserver/server.ts",
     "fresh": "rm -rf yarn.lock && rm -rf node_modules && yarn cache clean && yarn install"
   },
   "dependencies": {

@@ -19,16 +19,24 @@ io.on('connection', (socket: any) => {
     socket.emit('chat message', 'Welcome to the chat!');
   });
 
-  socket.on('join room', (room: string, username: string) => {
-    console.log('join room message', room, username);
-    socket.join(room);
-    socket.to(room).emit('chat message', `${username} has joined the room`);
+  socket.on('join-room', (room: string, username: string) => {
+    console.log('join room message', username, room);
+    io.emit('chat-message', {
+      id: socket.id,
+      msg: `${username} has joined the room`,
+    });
+    // io.to(room).emit('chat-message', {
+    //   id: socket.id,
+    //   room,
+    //   msg: `${username} has joined the room`,
+    // });
+    //io.to(room).emit('chat message', `${username} has joined the room`);
   });
 
-  socket.on('chat message', (room: string, msg: string) => {
+  socket.on('chat-message', (room: string, msg: string) => {
     console.log('chat message', room, msg);
     //socket.to(room).emit('chat message', msg);
-    io.emit('chat message', { id: generateId(), room, msg });
+    io.emit('chat-message', { id: generateId(), room, msg });
   });
 
   socket.on('disconnect', () => {
@@ -36,6 +44,6 @@ io.on('connection', (socket: any) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log('Listening on *:3000');
+server.listen(9000, () => {
+  console.log('Listening on *:9000');
 });
