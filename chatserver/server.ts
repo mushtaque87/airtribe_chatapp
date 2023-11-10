@@ -21,22 +21,19 @@ io.on('connection', (socket: any) => {
 
   socket.on('join-room', (room: string, username: string) => {
     console.log('join room message', username, room);
-    io.emit('chat-message', {
-      id: socket.id,
-      msg: `${username} has joined the room`,
+    socket.join(room);
+    io.to(room).emit('chat-message', {
+      id: generateId(),
+      room,
+      username,
+      msg: `${username} has joined the ${room}`,
     });
-    // io.to(room).emit('chat-message', {
-    //   id: socket.id,
-    //   room,
-    //   msg: `${username} has joined the room`,
-    // });
-    //io.to(room).emit('chat message', `${username} has joined the room`);
   });
 
-  socket.on('chat-message', (room: string, msg: string) => {
-    console.log('chat message', room, msg);
+  socket.on('chat-message', (room: string, username: string, msg: string) => {
+    console.log('chat message', room, username, msg);
     //socket.to(room).emit('chat message', msg);
-    io.emit('chat-message', { id: generateId(), room, msg });
+    io.emit('chat-message', { id: generateId(), room, username, msg });
   });
 
   socket.on('disconnect', () => {

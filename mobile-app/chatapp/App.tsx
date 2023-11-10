@@ -6,6 +6,8 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import Toast from 'react-native-toast-message';
+
 import type { PropsWithChildren } from 'react';
 import {
   Button,
@@ -52,22 +54,27 @@ function App(): JSX.Element {
     const newSocket = io('http://localhost:9000'); // replace with your server URL
     setSocket(() => newSocket);
 
-    newSocket.on('chat-message', chat => {
-      console.log('received chat message', chat, chats);
-      // setChats(chat => [...chats, chat]);
-      setChats(chats => [...chats, chat]);
-    });
-
-    newSocket.on('join-room', chat => {
-      console.log('join-room', chat);
-      // setChats(chat => [...chats, chat]);
-      //setChats(chats => [...chats, chat]);
-    });
-
     return () => {
       newSocket.disconnect();
     };
-  }, [chats]);
+  }, [chats, roomName]);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on('chat-message', chat => {
+      console.log('received chat message', userName, chat, chats);
+      console.log('roomName', roomName, chat.room);
+      // setChats(chat => [...chats, chat]);
+      if (roomName && chat.room && roomName === chat.room)
+        setChats(chats => [...chats, chat]);
+    });
+
+    socket.on('join-room', chat => {
+      console.log('join-room', chat);
+      // setChats(chat => [...chats, chat]);
+      setChats(chats => [...chats, chat]);
+    });
+  }, [socket, userName, roomName]);
 
   const renderItem = (item: any, index: number) => {
     return (
@@ -125,6 +132,15 @@ function App(): JSX.Element {
             <Button
               title="Enter"
               onPress={() => {
+                if (!roomName || !userName) {
+                  console.log('Please enter a room and user name');
+                  Toast.show({
+                    type: 'error',
+                    text1: 'Warning',
+                    text2: 'Please enter a room and user name 👋',
+                  });
+                  return;
+                }
                 if (socket && userName && roomName) {
                   socket.emit('join-room', roomName, userName);
                 }
@@ -155,8 +171,17 @@ function App(): JSX.Element {
               title="Send"
               onPress={() => {
                 console.log('Button pressed!');
+                if (!roomName) {
+                  console.log('Please enter a room');
+                  Toast.show({
+                    type: 'error',
+                    text1: 'Warning',
+                    text2: 'Please enter a room 👋',
+                  });
+                  return;
+                }
                 if (socket) {
-                  socket.emit('chat-message', roomName, chat);
+                  socket.emit('chat-message', roomName, userName, chat);
                   setChat('');
                 }
               }}
@@ -167,8 +192,24 @@ function App(): JSX.Element {
               data={chats}
               keyExtractor={item => item.id}
               renderItem={({ item }) => (
-                <View style={styles.item}>
-                  <Text style={styles.itemText}>{item.msg}</Text>
+                <View
+                  style={[
+                    styles.item,
+                    {
+                      backgroundColor:
+                        item.username === userName ? '#d9ead3' : '#cd9afe',
+                    },
+                  ]}>
+                  <Text
+                    style={[
+                      styles.itemText,
+                      {
+                        textAlign:
+                          item.username === userName ? 'right' : 'left',
+                      },
+                    ]}>
+                    {item.msg}
+                  </Text>
                 </View>
               )}
             />
@@ -184,6 +225,7 @@ function App(): JSX.Element {
           />
         </View>
       </ScrollView>
+      <Toast position="top" />
     </SafeAreaView>
   );
 }
