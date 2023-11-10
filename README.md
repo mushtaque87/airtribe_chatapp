@@ -1,6 +1,6 @@
 # airtribe_chatapp
 
-A simple real-time chat application using Node.js, Express.js, and Socket.IO.
+A simple real-time chat application using Node.js, Express.js, and Socket.IO and React Native as mobile apps
 
 # Start the chat server
 
