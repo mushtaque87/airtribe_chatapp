@@ -173,6 +173,15 @@ function App(): JSX.Element {
               )}
             />
           )}
+          <Button
+            title="Disconnect"
+            onPress={() => {
+              console.log('Button pressed!');
+              if (socket) {
+                socket.disconnect();
+              }
+            }}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
